@@ -64,7 +64,6 @@ async def send_embed(interaction: discord.Interaction,
     emb = discord.Embed(title=title, description=description, color=0x2f3136)  # make embed
     emb.set_image(url=image_url)  # image
     emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
-    emb.timestamp = message.created_at
 
     await interaction.response.send_message(embed=emb)  # sending embed
 
@@ -87,7 +86,6 @@ async def vote(interaction: discord.Interaction,
     emb = discord.Embed(title=f"Предложение #{j_mechanics.vote_number_mecha()}", description=description, color=0x2f3136)
     emb.set_image(url=image_url)  # image
     emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
-    emb.timestamp = message.created_at
 
     await interaction.response.send_message("Предложение создано!", ephemeral=True)  # sending message if ok
 
@@ -123,7 +121,6 @@ async def mute(interaction: discord.Interaction,
                         color=0xff0800)
     emb.add_field(name='Причина', value=f'\n**`{reason}`**')  # reason
     emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
-    emb.timestamp = message.created_at
 
     await interaction.response.send_message(embed=emb, ephemeral=True)  # sending message if ok
     message = await interaction.guild.get_channel(766935673478447145).send(embed=emb)  # sending embed to log channel
@@ -149,7 +146,6 @@ async def unmute(interaction: discord.Interaction,
                         description=f'{member.mention} теперь может говорить', 
                         color=0xff0800)
     emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
-    emb.timestamp = message.created_at
 
     await interaction.response.send_message(embed=emb, ephemeral=True)  # sending message if ok
     message = await interaction.guild.get_channel(766935673478447145).send(embed=emb)  # sending embed to log channel
@@ -178,13 +174,12 @@ async def warn(interaction: discord.Interaction,
                             description=f'{member.mention} получает мут на 6 часов за предупреждения', 
                             color=0xff0800)
         emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
-        emb.timestamp = message.created_at
+
     else:
         emb = discord.Embed(title='Предупреждение!', 
                             description=f'{member.mention} получает своё {warns_count} предупреждение', 
                             color=0xff0800)
         emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
-        emb.timestamp = message.created_at
 
     await interaction.response.send_message(embed=emb, ephemeral=True)  # sending message if ok
     message = await interaction.guild.get_channel(766935673478447145).send(embed=emb)  # sending embed to log channel
@@ -202,13 +197,13 @@ async def report_message(interaction: discord.Interaction,
                          message: discord.Message):
     await interaction.response.send_message(f'Твоя жалоба на {message.author.mention} передана модераторам :3', ephemeral=True)
 
-    emb = discord.Embed(title='Репорт на сообщение')
+    date_created = f"{message.created_at.day}.{message.created_at.month}.{message.created_at.year} в {message.created_at.hour}:{message.created_at.minute}"
+    emb = discord.Embed(title=f'Репорт на сообщение {message.author} \n(отправлено {date_created})', description=f"Провинившийся: {message.author}")
     if message.content:
         emb.description = message.content
 
-    emb.set_author(name=f"Провинившийся: {message.author}", icon_url=message.author.display_avatar)  # who was reported
+    emb.set_thumbnail(url=message.author.display_avatar)  # who was reported
     emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
-    emb.timestamp = message.created_at
 
     url_view = discord.ui.View()
     url_view.add_item(discord.ui.Button(label='Перейти к сообщению', style=discord.ButtonStyle.url, url=message.jump_url))
