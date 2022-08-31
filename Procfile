@@ -1,0 +1,1 @@
+worker: python j_main.py
