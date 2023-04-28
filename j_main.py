@@ -9,6 +9,7 @@ from typing import Optional
 
 import discord
 from discord import app_commands
+from discord import Spotify
 import j_token
 import j_mechanics
 
@@ -18,7 +19,7 @@ from humanfriendly import format_timespan, parse_timespan
 # ==============================================================================
 
 MY_GUILD = discord.Object(id=700246237244555334)  # Parad0x server id
-MY_TOKEN = j_token.jett_TOKEN()  # Jett#2399 token
+MY_TOKEN = j_token.girl_TOKEN()  # bot's token
 
 # ==============================================================================
 
@@ -41,7 +42,10 @@ ON READY
 """
 @client.event
 async def on_ready():
-    print(f"Logged in as {client.user} (ID: {client.user.id})")
+    print(f"Залогинилась как {client.user} (айди: {client.user.id})")
+    guild = client.get_guild(MY_GUILD)
+    await client.change_presence(status=discord.Status.online, 
+                              activity=discord.Streaming(name="Counter Strike 2", url="https://www.twitch.tv/3wpty"))
 
 
 # ==============================================================================
@@ -49,17 +53,17 @@ async def on_ready():
 EMBED:
     only for staff
 """
-@client.tree.command()
+@client.tree.command(name="embed")
 @app_commands.checks.has_permissions(ban_members=True)
 @app_commands.describe(title="Заголовок окна", 
                        description="Описание окна", 
                        image_url="Ссылка на изображение внутри окна под описанием")
 
-async def send_embed(interaction: discord.Interaction, 
+async def cmd_send_embed(interaction: discord.Interaction, 
                      title: str, 
                      description: Optional[str] = None, 
                      image_url: Optional[str] = None):
-    """Простой конструктор окна-вставки"""
+    """ADMIN ONLY // Создать окно-вставку """
 
     emb = discord.Embed(title=title, description=description, color=0x2f3136)  # make embed
     emb.set_image(url=image_url)  # image
@@ -68,20 +72,33 @@ async def send_embed(interaction: discord.Interaction,
     await interaction.response.send_message(embed=emb)  # sending embed
 
 
+# ==============================================================================
+"""
+KDJFJKSJKDJKLLJVVJLDGKVDJFLKGKVDJGBLVDGBJKLDVGBKFJLDVFGBJVDFKLLBJKVDFGBJKLLVDFGJKLDFVGJK:
+    only for staff
+"""
+@client.tree.command(name="ping")
+
+async def ping(interaction: discord.Interaction):
+    """yes"""
+
+    await interaction.response.send_message("xd xd x dx d x d")  # sending message
+
+
 
 # ==============================================================================
 """
 VOTING:
     for all users
 """
-@client.tree.command()
+@client.tree.command(name="vote")
 @app_commands.describe(description="Твоё предложение по серверу", 
                        image_url="Ссылка на одно изображение, если тебе надо")
 
-async def vote(interaction: discord.Interaction,
+async def cmd_vote(interaction: discord.Interaction,
                description: str, 
                image_url: Optional[str] = None):
-    """Предложение/опрос относительно сервера на любую тему """
+    """Добавить предложение/опрос относительно сервера на любую тему"""
 
     emb = discord.Embed(title=f"Предложение #{j_mechanics.vote_number_mecha()}", description=description, color=0x2f3136)
     emb.set_image(url=image_url)  # image
@@ -101,17 +118,17 @@ async def vote(interaction: discord.Interaction,
 MUTE:
     for mods and staff
 """
-@client.tree.command()
+@client.tree.command(name="mute")
 @app_commands.checks.has_permissions(view_audit_log=True)
 @app_commands.describe(member="Чел, которого хочешь замутить", 
                        time="Время в формате 1s/1m/1h/1d",
                        reason="Причина мута")
 
-async def mute(interaction: discord.Interaction,
+async def cmd_mute(interaction: discord.Interaction,
                member: discord.Member, 
                time: str, 
                reason: Optional[str] = "Причина не указана"):
-    """Мут пользователя через таймаут"""
+    """MOD ONLY // Выдать мут пользователю через таймаут"""
 
     time = parse_timespan(time)  # converting time
     await member.timeout(discord.utils.utcnow()+datetime.timedelta(seconds=time), reason=reason)  # mute user
@@ -132,13 +149,13 @@ async def mute(interaction: discord.Interaction,
 UNMUTE:
     for mods and staff
 """
-@client.tree.command()
+@client.tree.command(name="unmute")
 @app_commands.checks.has_permissions(view_audit_log=True)
 @app_commands.describe(member="Чел, которого хочешь размутить")
 
-async def unmute(interaction: discord.Interaction,
+async def cmd_unmute(interaction: discord.Interaction,
                  member: discord.Member):
-    """Анмут пользователя через таймаут"""
+    """MOD ONLY // Размутить пользователя через таймаут"""
 
     await member.timeout(discord.utils.utcnow()+datetime.timedelta(seconds=1))  # unmute user
 
@@ -157,15 +174,15 @@ async def unmute(interaction: discord.Interaction,
 WARN:
     for mods and staff
 """
-@client.tree.command()
+@client.tree.command(name="warn")
 @app_commands.checks.has_permissions(view_audit_log=True)
 @app_commands.describe(member="Чел, который получит предупреждение", 
                        reason="Причина предупреждения")
 
-async def warn(interaction: discord.Interaction,
+async def cmd_warn(interaction: discord.Interaction,
                member: discord.Member,
                reason: Optional[str] = "Причина не указана"):
-    """Варн пользователя (4 предупреждения = мут на 6 часов)"""
+    """MOD ONLY // Выдать предупреждение пользователю (4 предупреждения = мут на 6 часов)"""
 
     warns_count, more_than_two = j_mechanics.warn_mecha(member.id)  # how many warns
     if more_than_two:  # if user has 4 warns
@@ -173,12 +190,14 @@ async def warn(interaction: discord.Interaction,
         emb = discord.Embed(title='Мут!', 
                             description=f'{member.mention} получает мут на 6 часов за предупреждения', 
                             color=0xff0800)
+        emb.add_field(name='Причина', value=f'\n**`{reason}`**')  # reason
         emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
 
     else:
         emb = discord.Embed(title='Предупреждение!', 
                             description=f'{member.mention} получает своё {warns_count} предупреждение', 
                             color=0xff0800)
+        emb.add_field(name='Причина', value=f'\n**`{reason}`**')  # reason
         emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
 
     await interaction.response.send_message(embed=emb, ephemeral=True)  # sending message if ok
@@ -188,14 +207,141 @@ async def warn(interaction: discord.Interaction,
 
 # ==============================================================================
 """
+CREATING ROLE:
+    for all users
+"""
+@client.tree.command(name="add-custom-role")
+@app_commands.describe(name="Название твоей роли",
+                       color="Любой цвет роли в формате rrggbb (Пример: красный - `ff0000`, голубой - `6ed8f0`)")
+
+async def cmd_add_custom_role(interaction: discord.Interaction, 
+                      name: str, 
+                      color: str):
+    """Создать свою уникальную роль (своё название и цвет)"""
+
+
+    if color == "420":  # if no some of args
+
+        emb = discord.Embed(title=":warning:**Ошибка!**",
+                            description="Цвет указан неправильно",
+                            color=0xffcc4d)
+
+    else:  # if Ok
+        role_already_exist = j_mechanics.role_mecha(interaction.user.id)  # role already exist or not
+
+        if role_already_exist:  # if user already have custom role
+            role_id = j_mechanics.role_id_mecha(interaction.user.id)  # finding id of role from json file
+            role = interaction.guild.get_role(role_id)  # getting role object
+            role = await role.edit(name=name, color=int(f"0x{color}", 16), position=(len(interaction.guild.roles)-10))  # editing role
+            await interaction.user.add_roles(role)  # give role to the user
+
+
+        else:
+
+            role = await interaction.guild.create_role()  # creating role
+            role = await role.edit(name=name, color=int(f"0x{color}", 16), position=(len(interaction.guild.roles)-10))  # editing role
+            j_mechanics.role_id_mecha(interaction.user.id, role.id)  # save role id to json file
+            await interaction.user.add_roles(role)  # give role to the user
+
+        emb = discord.Embed(title='Роль сделана!', 
+                            description=f'{interaction.user.mention} сделал себе уникальную роль: <@&{role.id}>', 
+                            color=0x77b255)
+
+    emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
+
+    await interaction.response.send_message(embed=emb)  # sending embed
+    message = await interaction.guild.get_channel(766935673478447145).send(embed=emb)  # sending embed to log channel
+
+
+
+
+# ==============================================================================
+"""
+DELETING CREATED ROLE:
+    for all users
+"""
+@client.tree.command(name="remove-custom-role")
+@app_commands.describe(confirm="Напиши `yes` без кавычек для удаления роли")
+
+async def cmd_remove_custom_role(interaction: discord.Interaction, 
+                      confirm: str):
+    """Удалить свою уникальную роль (потом можно будет создать новую)"""
+
+    if confirm != "yes":  # if no some of args
+
+        emb = discord.Embed(title=":warning:**Ошибка!**",
+                            description="Напиши `yes` в поле **confirm** чтобы удалить кастомную роль",
+                            color=0xffcc4d)
+
+    else:  # if Ok
+        role_already_exist = j_mechanics.role_mecha(interaction.user.id)  # role already exist or not
+
+        if role_already_exist:  # if user already have custom role
+            role_id = j_mechanics.role_id_mecha(interaction.user.id)  # finding id of role from json file
+            role = interaction.guild.get_role(role_id)  # getting role object
+            await interaction.user.remove_roles(role)  # give role to the user
+
+            emb = discord.Embed(title='Роль удалена!', 
+                                description=f'{interaction.user.mention} удалил свою уникальную роль', 
+                                color=0x77b255)
+
+        else:
+
+            emb = discord.Embed(title=":warning:**Ошибка!**",
+                            description="У тебя нет кастомной роли",
+                            color=0xffcc4d)
+
+
+    emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
+
+    await interaction.response.send_message(embed=emb)  # sending embed
+    message = await interaction.guild.get_channel(766935673478447145).send(embed=emb)  # sending embed to log channel
+
+
+
+# ==============================================================================
+"""
+SPOTIFY:
+    for all users
+"""
+@client.tree.command(name="spotify")
+@app_commands.describe(member="Чел, который слушает споти")
+
+async def cmd_spotify(interaction: discord.Interaction, 
+                      member: Optional[discord.Member] = None):
+    """Проверить что слушает чел в спотифае"""
+
+    if member == None:
+        member = interaction.user
+
+    if member.activities:
+        for activity in member.activities:
+            if isinstance(activity, Spotify):
+                emb = discord.Embed(
+                    title = f"Что же слушает {member.nick}?",
+                    description = "Слушает {}".format(activity.title),
+                    color = 0x1ed760)
+                emb.set_thumbnail(url=activity.album_cover_url)
+                emb.add_field(name="Исполнитель", value=activity.artist)
+                emb.add_field(name="Альбом", value=activity.album)
+                emb.set_footer(text="Песня включилась в {}".format(activity.created_at.strftime("%H:%M")))
+                await interaction.response.send_message(embed=emb)
+    else:
+        emb = discord.Embed(title=f":warning:**Ошибка!** {member.activities}",
+                            description=f"{member.nick} нихуя не слушает",
+                            color=0xffcc4d)
+        await interaction.response.send_message(embed=emb)
+
+# ==============================================================================
+"""
 REPORT MESSAGE:
     for all users
     context menu
 """
-@client.tree.context_menu(name='Репорт модерам')
-async def report_message(interaction: discord.Interaction, 
+@client.tree.context_menu(name="・ Репорт")
+async def cmd_report_message(interaction: discord.Interaction, 
                          message: discord.Message):
-    await interaction.response.send_message(f'Твоя жалоба на {message.author.mention} передана модераторам :3', ephemeral=True)
+    await interaction.response.send_message(f'Твоя жалоба на {message.author.mention} передана модераторам <3', ephemeral=True)
 
     date_created = f"{message.created_at.day}.{message.created_at.month}.{message.created_at.year} в {message.created_at.hour}:{message.created_at.minute}"
     emb = discord.Embed(title=f'Репорт на сообщение {message.author} \n(отправлено {date_created})', description=f"Провинившийся: {message.author}")
@@ -206,7 +352,7 @@ async def report_message(interaction: discord.Interaction,
     emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
 
     url_view = discord.ui.View()
-    url_view.add_item(discord.ui.Button(label='Перейти к сообщению', style=discord.ButtonStyle.url, url=message.jump_url))
+    url_view.add_item(discord.ui.Button(label='Перейти к сообщению', style=discord.ButtonStyle.url, url=message   .jump_url))
 
     await interaction.guild.get_channel(758279107006955531).send(embed=emb, view=url_view)  # sending embed to moderator channel
 
@@ -218,7 +364,7 @@ async def report_message(interaction: discord.Interaction,
 #                 RUN
 #                 RUN
 #                 RUN
-client.run(j_token.jett_TOKEN())
+client.run(j_token.girl_TOKEN())
 #                 RUN
 #                 RUN
 #                 RUN
