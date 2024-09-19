@@ -127,22 +127,22 @@ def vote_number_mecha():
 
 # ==============================================================================
 # GET TWITCH TITLE
-def get_twitch_title_mecha():
+# def get_twitch_title_mecha():
 
-    # loading html
-    fp = urllib.request.urlopen("https://www.twitch.tv/3wpty")
-    mybytes = fp.read()
-    mystr = mybytes.decode("utf8")
-    fp.close()
+#     # loading html
+#     fp = urllib.request.urlopen("https://www.twitch.tv/3wpty")
+#     mybytes = fp.read()
+#     mystr = mybytes.decode("utf8")
+#     fp.close()
 
-    # cutting title
-    mystr = str(mystr)
-    mystr = mystr[:1000]
-    mystr = mystr.split("<meta name=\"twitter:description\" content=\"")
-    mystr = mystr[1]
-    # mystr = mystr[2:]
-    mystr = mystr[:mystr.find("\"/><")]
+#     # cutting title
+#     mystr = str(mystr)
+#     mystr = mystr[:1000]
+#     mystr = mystr.split("<meta name=\"twitter:description\" content=\"")
+#     mystr = mystr[1]
+#     # mystr = mystr[2:]
+#     mystr = mystr[:mystr.find("\"/><")]
 
-    return mystr
+#     return mystr
 
 # ==============================================================================

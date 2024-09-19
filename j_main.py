@@ -434,34 +434,7 @@ async def cmd_disconnect_from_voice(interaction: discord.Interaction):
         await voice_client.disconnect()
 
     await interaction.response.send_message(f'Отключилась от твоего канала', ephemeral=True)
-
-
-
-
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-# ==============================================================================
-
+    
 
 
 
@@ -470,25 +443,25 @@ async def cmd_disconnect_from_voice(interaction: discord.Interaction):
 TWITCH ANNOUNCEMENT:
     only for staff
 """
-@client.tree.command(name="ttv-announcement")
-@app_commands.checks.has_permissions(ban_members=True)
-@app_commands.describe(title="Заголовок", 
-                       description="Описание", 
-                       image_url="Ссылка на изображение внутри окна под описанием")
+# @client.tree.command(name="ttv-announcement")
+# @app_commands.checks.has_permissions(ban_members=True)
+# @app_commands.describe(title="Заголовок", 
+#                        description="Описание", 
+#                        image_url="Ссылка на изображение внутри окна под описанием")
 
-async def cmd_send_embed(interaction: discord.Interaction, 
-                     title: Optional[str] = "Эмпти запустил стрим!", 
-                     description: Optional[str] = j_mechanics.get_twitch_title_mecha(), 
-                     image_url: Optional[str] = "https://i.imgur.com/2hc6rHx.png"):
-                     # image_url: Optional[str] = "https://i.ibb.co/jyYyDcN/image-2024-09-14-214416177.png"):
-    """ADMIN ONLY // Анонс стрима Эмпти"""
+# async def cmd_send_embed(interaction: discord.Interaction, 
+#                      title: Optional[str] = "Эмпти запустил стрим!", 
+#                      description: Optional[str] = j_mechanics.get_twitch_title_mecha(), 
+#                      image_url: Optional[str] = "https://i.imgur.com/2hc6rHx.png"):
+#                      # image_url: Optional[str] = "https://i.ibb.co/jyYyDcN/image-2024-09-14-214416177.png"):
+#     """ADMIN ONLY // Анонс стрима Эмпти"""
 
 
-    emb = discord.Embed(title=title, description=description, color=0xff0084)  # make embed
-    emb.set_image(url=image_url)  # image
-    emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
+#     emb = discord.Embed(title=title, description=description, color=0xff0084)  # make embed
+#     emb.set_image(url=image_url)  # image
+#     emb.set_footer(text=f"Инициатор: {interaction.user}", icon_url=interaction.user.display_avatar)  # who called it
 
-    await interaction.response.send_message(embed=emb)  # sending embed
+#     await interaction.response.send_message(embed=emb)  # sending embed
 
 
 
