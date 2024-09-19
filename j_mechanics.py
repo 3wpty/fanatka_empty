@@ -4,6 +4,7 @@ CLEAN PYTHON FILE WITH SOME OF LARGE MECHANICS FOR MAIN FILE
 
 import json
 import random
+import urllib.request
 
 # ==============================================================================
 # OPEN JSON -> WARN (BAN) -> UPDATE JSON
@@ -69,38 +70,6 @@ def role_id_mecha(user, role = "420"):
         json.dump(data, filename, indent=4)  # updating json file
 
 
-# ==============================================================================
-# OPEN JSON -> CHANGE AVI -> UPDATE JSON
-def dm_avi_mecha(user):
-    flag = True
-    with open("j_dm_avi.json", "r") as filename:
-        data = json.load(filename)  # loading json file
-
-    for key, value in data.items():
-            if key == user:
-                flag = False  # user already exist
-                print("already")
-                break
-
-    if flag:  # if user not in list
-        # data[user] = random.choice(["⚪", "⚫", "🟤", "🟣", "🔵", "🟢", "🟡", "🟠", "🔴"])  # creating new value
-        data[user] = random.choice([":white_circle:", 
-                                    ":black_circle:", 
-                                    ":red_circle:", 
-                                    ":blue_circle:", 
-                                    ":brown_circle:", 
-                                    ":purple_circle:", 
-                                    ":green_circle:", 
-                                    ":yellow_circle:",
-                                    ":orange_circle:"
-                                    ])  # creating new value
-        print(data[user])
-
-    with open("j_dm_avi.json", "w") as filename:
-        json.dump(data, filename, indent=4)  # updating json file
-
-    return (data[user])
-
 
 # ==============================================================================
 # CONVERTING TIME
@@ -155,5 +124,25 @@ def vote_number_mecha():
     filename.close()
     return number
 
+
+# ==============================================================================
+# GET TWITCH TITLE
+def get_twitch_title_mecha():
+
+    # loading html
+    fp = urllib.request.urlopen("https://www.twitch.tv/3wpty")
+    mybytes = fp.read()
+    mystr = mybytes.decode("utf8")
+    fp.close()
+
+    # cutting title
+    mystr = str(mystr)
+    mystr = mystr[:1000]
+    mystr = mystr.split("<meta name=\"twitter:description\" content=\"")
+    mystr = mystr[1]
+    # mystr = mystr[2:]
+    mystr = mystr[:mystr.find("\"/><")]
+
+    return mystr
 
 # ==============================================================================
